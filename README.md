@@ -8,20 +8,29 @@ I was driven by my need for sample data for the 2011 ZE0 and being unable to fin
 
 Basically there is plenty of information on CAN messages for the Nissan Leaf but it is often for a different model from the one you need and the message formats have changed from model to model.
 
-This repo will first focus on the ZEO as that is what I have so what I can capture messages from.  Hopefully others may see this as a place to add information they have found for their model, but does risk just being another site with the same good intent, much like the XKCD situation with standards:
+This repo will first focus on the ZE0 as that is what I have so what I can capture messages from.  Hopefully others may see this as a place to add information they have found for their model, but does risk just being another site with the same good intent, much like the XKCD situation with standards:
 
 ![](standards.png)
 
-The structure of this repo is a utilities folder and one folder for each model of Leaf.  In that folder at minimum we want:
+The structure of this repo is:
+```
+├── 2011_ZE0
+│   └── ukoda
+└── utils
+```
 
-* A README.md file detailing each of the other files in the folder
-	* The README.md should list supporting links and credits where the work of others has helped source the information.
-	* For DBC files it should indicate what busses it relates to and what messages or group of messages it decodes.  Comments of completeness or limitations are often helpful.
-	* For captured data it should indicate which bus the data was captured from and what state the vehicle was in.
-	* For images it should indicate which data capture(s) it relates to.
-	* For PDF the original source should be provided.
-* Supporting DBC files.
-* Captured data used to create and test DBC files.  At this time I am using excellent and free SavvyCAN that saves captured data in simple CSV files.
+In all folders there is a README.md that describes the files and sub-folders present in that folder.
+* The README.md should list supporting links and credits where the work of others has helped source the information.
+* For DBC files it should indicate what busses it relates to and what messages or group of messages it decodes.  Comments of completeness or limitations are often helpful.
+* For captured data it should indicate which bus the data was captured from and what state the vehicle was in.
+* For images it should indicate which data capture(s) it relates to.
+* For PDF the original source should be provided.
+
+At the top level is a folder for each model of Leaf that there is files for and a utils folder.
+
+The utils folder contains utilities for working with DBC files.
+
+In each vehicle folder there is DBC files for that model and there is a sub-folders for each user that has the related user's contributed message capture files.
 
 We can optionally have supporting files such as:
 
@@ -32,13 +41,13 @@ We can optionally have supporting files such as:
 
 For collecting and analysing CAN message I use the open source cross platorm [SavvyCAN](https://savvycan.com/) software.
 
-TODO: Added a link to SavvyCAN user guide if good on exists.
+TODO: Added a link to SavvyCAN user guide if good one exists.
 
 While the classic ELM327 type ODB2 adaptor is popular for accessing a desired subset of the CAN messages it needs to filter messages as it has serious performance limitation.  The main Leaf bus can have over 1000 CAN messages being sent every second when the car is ready to drive.  The ELM327 can only handle a fraction of that number of messages in a second.  Therefore I use a [Peak System CAN to USB adaptor](https://www.aliexpress.com/item/1005011625782729.html) which is cheap and can keep up with the full message rate of the Leaf CAN bus. NB: SavvyCAN recommend the CANDue board, which is about 10 times the price of the one I used.
 
 There was a few issues with getting SavvyCAN and the Peak CAN USB set up and working on my Linux system.  The key steps on my Linux Mint system where:
 
-1. [Downloaded SavvyCAN](https://github.com/collin80/SavvyCAN/releases) as a Linux AppImage to a location on path, changed to a+x and created softlink as savvycan.  If you only wish to view CAN captures you SavvyCAN should now work.  The rest of the steps are perform captures.
+1. [Downloaded SavvyCAN](https://github.com/collin80/SavvyCAN/releases) as a Linux AppImage to a location on path, changed to a+x and created softlink as savvycan.  If you only wish to view CAN captures your copy of SavvyCAN should now work.  The rest of the steps are perform captures.
 2. `sudo apt install libsocketcan2*`
 3. Plug in the Peak CAN USB.  Check `dmesg` that is was detected as `can0`.
 4. `sudo ip link set can0 up type can bitrate 500000`
