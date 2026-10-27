@@ -63,7 +63,7 @@ Packets should now start being captured. The Left two LEDs on the Peak CAN will 
 
 ## CAN busses
 
-Leaf has three CAN busses, as detailed [here](https://leaf-obd.readthedocs.io/en/latest/diagnostic-connector.html), on the ODB2 port.
+Leaf has three ISO 15765‐4 (CAN 11/500) CAN busses, as detailed [here](https://leaf-obd.readthedocs.io/en/latest/diagnostic-connector.html), on the ODB2 port.
 
 They are:
 
@@ -72,3 +72,38 @@ They are:
 3. Pins 11 and 3.  The AV CAN bus which has messages related to the infotainment system.
 
 For the Peak USB CAN adaptor it does not have an ODB2 type connector, just three screw terminals.  I used the connector and case from a cheap ELM327 adaptor that was unreliable and removed the PCBA from it.  I fitted a three way switch to select the bus I want to capture from the OSB2 connector and from the switch a cable to the Peak USB CAN.
+
+## CAN message protocols
+
+There appears to be generally two types of CAN messages.
+
+### Periodic messages
+
+Firstly there is periodic messages send with an ID for use by any device that might need then.  You can simply passively listen to the CAN bus until a message with the ID of interest is received.  The messages are implemented to fit within the 8 byte data limit of the ISO 15765‐4.
+
+### Requested messages
+
+Secondly there is requested messaging.  This is common with ECU where you will send a message with a specific ID for an ECU as request and the ECU will reply reply with a different specific ID.  These replies can exceed the 8 byte limit so another protocol, ISO-TP, is stacked on top of ISO 15765‐4.
+
+This is covered by [ISO 15765-2 (ISO-TP)](https://docs.kernel.org/networking/iso15765-2.html) using its “mixed” addressing format where "each address is represented by a CAN ID plus the first byte of the CAN payload; the CAN ID is different between two addresses, but the additional byte is the same.".
+
+The use of this protocol means the first of the 8 data bytes, and the second and third in some cases, is used used by ISO-TP and you will see multiple CAN packets exchanged to get information from the an ECU.  For example requesting a vehicles chassis type or VIN.
+
+The good news is you can ignore much of that and simply send the correctly formatted CAN messages in the correct order and look for the right pattern in the replies.  If sending a message to an fails ECU fails to get a response you probably failed to send a needed earlier message that sets things up.  Looking at captures saved in the repo can help if you want to avoid reading and understanding ISO-TP.
+
+#### Undocumented protocol
+
+In looking at the data that remains after ISO-TP there appear another undocumented protocol stacked on top ISO-TP.  What follows is 100% speculation.
+
+The first byte has:
+
+* Bit 6 is 0 for a query and 1 for a reply.
+* Bit 5 may mean there is data in the reply.
+* Bit 1 is set when there is 2 head bytes to follow and clear for 1.
+* Bit 0 may mean there is a multi-message response expected.
+
+One message with a single byte after the first byte is the `10 C0` message with no data.  This message appears to be needed when first tying to get data from an ECU.  If it is not sent then any following messages appear to be ignored.  In lieu of a better name I will call this `Access Request` in other README.md documents in this repo.
+
+The only other message with a single byte after the first byte seen so far is the ZE0 chassis name which has multiple reply messages.
+
+The other message with 2 bytes they appear to be the information type indicator.    In other README.md documents in this repo I will treat them as 16 bit information type number and use that for message titles and reference.  Where they relate to known messages contents I will append the common use name to the title and use just the name elsewhere.
