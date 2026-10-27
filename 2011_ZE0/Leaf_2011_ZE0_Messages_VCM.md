@@ -249,12 +249,9 @@ NB: Bytes 4 and 5 matches 2018 data and in line with LeafSpy.  Also there are th
 *	Answer: 0x79A 07 62 11 83 **81 DA** 00 0E
 	* Length: 7
 	* Data: 62 11 83 **81 DA** 00 0E
-*	Formula: Value is (data[4] << 8) | data[5]. MSB is charge / discharge bit. Set is probably charging. Remove MSB from value for absolute current which needs divided by 256 to get amps.
-	* Value = data[4] << 8) | data[5]
-	* Charging = (Value & 0x8000) == 0x8000
-	* Current = (Value & 0x7FFF) / 256
+*	Formula: Value is (((data[4] << 8) | data[5]) - 0x8000) / 256.  Positive when charging 12V battery and negative when discharging.
 
-NB: Bytes 4 and 5 matches LeafSpy screen.  Also there are two extra bytes returned, 00 0E, that have an unknown meaning.  Note also negative numbers are calculated differently from 2018 data.
+NB: Bytes 4 and 5 matches LeafSpy screen.  Also there are two extra bytes returned, 00 0E, that have an unknown meaning.  Note also negative numbers maybe calculated differently from 2018 data.
 
 This was the only message not sent during the initial sequence when LeafSpy started.  Probably because current calculation method is model dependant.
 
