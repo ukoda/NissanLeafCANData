@@ -1,8 +1,10 @@
 # Nissan Leaf 2011 ZE0 Messages
 
-These are messages you can send to ECUs to make queries and get responses.
+These are UDS messages you can send to ECUs to make queries and get responses.
 
 Much of the initial information is based on the commonly seen document `Leaf2018-CAN.pdf` where many, but not all, messages are the same.  I don't know who should get credit for the creation of that document.  That document is not included in this folder to avoid confusion.  Where messages appear to be the same the names from that document will be used for the ZE0 messages too.
+
+There are 3 layers of protocols in use, as detailed in the root folder README.md.  In the linked documents for messages relating to ECUs the raw ISO 15765‐4 (CAN 11/500) is first shown with the parts relating to ISO 14229-1 (UDS) and ISO 15765-2 (ISO-TP) indented.
 
 ## ECUs
 
